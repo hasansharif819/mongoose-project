@@ -9,6 +9,24 @@ const createUserIntoDB = async (userData: TUser) => {
   return result;
 };
 
+const getAllUsersFromDB = async () => {
+  const result = await Users.find();
+  return result;
+};
+
+const getSingleUserFromDB = async (userId: number) => {
+  const result = await Users.aggregate([{ $match: { userId } }]);
+  return result;
+};
+
+const deleteUserFromDB = async (userId: number) => {
+  const result = await Users.updateOne({ userId }, { isDeleted: true });
+  return result;
+};
+
 export const UserServices = {
   createUserIntoDB,
+  getAllUsersFromDB,
+  getSingleUserFromDB,
+  deleteUserFromDB,
 };

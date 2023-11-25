@@ -23,6 +23,68 @@ const createUser = async (req: Request, res: Response) => {
     });
   }
 };
+
+const getAllUsers = async (req: Request, res: Response) => {
+  try {
+    const result = await UserServices.getAllUsersFromDB();
+    res.status(200).json({
+      success: true,
+      message: 'Users fetched successfully',
+      data: result,
+    });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'User not fetched successfully',
+      error: error,
+    });
+  }
+};
+
+const getSingleUser = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const userIdNumber = Number(userId);
+    const result = await UserServices.getSingleUserFromDB(userIdNumber);
+    res.status(200).json({
+      success: true,
+      message: 'Single user fetched successfully',
+      data: result,
+    });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'User id is not fetched successfully',
+      error: error,
+    });
+  }
+};
+
+const deleteUser = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const userIdNumber = Number(userId);
+    const result = await UserServices.deleteUserFromDB(userIdNumber);
+    res.status(200).json({
+      success: true,
+      message: 'This user is deleted successfully',
+      data: result,
+    });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'This user is not deleted',
+      error: error,
+    });
+  }
+};
+
 export const UserController = {
   createUser,
+  getAllUsers,
+  getSingleUser,
+  deleteUser,
 };

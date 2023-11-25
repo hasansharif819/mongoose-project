@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/no-this-alias */
 import { Schema, model } from 'mongoose';
+import bcrypt from 'bcrypt';
 import {
   TAddress,
   TOrders,
@@ -6,6 +8,7 @@ import {
   TUserName,
   UserModel,
 } from './users.interface';
+import config from '../../config';
 
 const userNameSchema = new Schema<TUserName>({
   firstName: {
@@ -100,6 +103,39 @@ const userSchema = new Schema<TUser, UserModel>({
     type: [ordersSchema],
     required: true,
   },
+});
+
+userSchema.pre('save', async function (next) {
+  const user = this;
+  user.password = await bcrypt.hash(
+    user.password,
+    Number(config.bcrypt_salt_rounds),
+  );
+  next();
+});
+
+//post middleware save
+userSchema.post('save', async function (doc, next) {
+  doc.password = '';
+  next();
+});
+
+//Query Middleware
+//isDeleted field true hole data show korbe na
+userSchema.pre('find', function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
+//findOne er jonno
+userSchema.pre('find', function (next) {
+  this.findOne({ isDeleted: { $ne: true } });
+  next();
+});
+
+//Aggregate function er jonno
+userSchema.pre('aggregate', function (next) {
+  this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
+  next();
 });
 
 userSchema.statics.isUserExists = async function (userId: number) {
