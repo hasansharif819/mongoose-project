@@ -10,7 +10,12 @@ const createUserIntoDB = async (userData: TUser) => {
 };
 
 const getAllUsersFromDB = async () => {
-  const result = await Users.find();
+  //   const result = await Users.find();
+  const result = await Users.aggregate([
+    { $match: {} },
+    { $project: { password: 0, __v: 0, isDeleted: 0 } },
+    { $sort: { userId: 1 } },
+  ]);
   return result;
 };
 
@@ -40,9 +45,6 @@ const getSingleUserOrdersFromDB = async (userId: number) => {
       $group: {
         _id: null,
         orders: { $push: '$orders' },
-        // totalPrice: {
-        //   $sum: { $multiply: ['$orders.price', '$orders.quantity'] },
-        // },
       },
     },
     { $project: { _id: 0, orders: 1 } },
