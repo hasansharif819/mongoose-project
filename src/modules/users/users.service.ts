@@ -3,7 +3,7 @@ import { Users } from './users.model';
 
 const createUserIntoDB = async (userData: TUser) => {
   if (await Users.isUserExists(userData.userId)) {
-    throw new Error('User / Student already exists!!!!');
+    throw new Error('User already exists!!!!');
   }
   const result = await Users.create(userData);
   return result;
@@ -24,9 +24,15 @@ const deleteUserFromDB = async (userId: number) => {
   return result;
 };
 
+const updateUserById = async (userId: number, userData: TUser) => {
+  const result = await Users.updateOne({ userId }, userData);
+  return result;
+};
+
 export const UserServices = {
   createUserIntoDB,
   getAllUsersFromDB,
   getSingleUserFromDB,
   deleteUserFromDB,
+  updateUserById,
 };

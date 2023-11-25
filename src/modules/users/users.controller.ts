@@ -82,9 +82,38 @@ const deleteUser = async (req: Request, res: Response) => {
   }
 };
 
+const updateUserById = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const userIdNumber = Number(userId);
+    const { user: userData } = req.body;
+
+    const zodParsedData = userZodValidationSchema.parse(userData);
+    const result = await UserServices.updateUserById(
+      userIdNumber,
+      zodParsedData,
+    );
+
+    // const result = await UserServices.updateUserById({ userIdNumber }, userData);
+    res.status(200).json({
+      status: 'Success',
+      message: `Updating successful in ${userId}`,
+      data: result,
+    });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'This user is not updated',
+      error: error,
+    });
+  }
+};
+
 export const UserController = {
   createUser,
   getAllUsers,
   getSingleUser,
   deleteUser,
+  updateUserById,
 };
