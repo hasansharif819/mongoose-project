@@ -29,10 +29,25 @@ const updateUserById = async (userId: number, userData: TUser) => {
   return result;
 };
 
+// const getSingleUserOrdersFromDB = async (userId: number) => {
+//   const result = await Users.aggregate([{ $match: { userId } }]);
+//   const orders: Order[] = result?.orders;
+//   const [myorders] = result?.orders[0] || [];
+//   console.log('myOrders = ', myorders);
+
+// //   const data = result?.orders;
+// // if(result.orders){
+// //     const { orders: userOrders } = result;
+// //     console.log('Result = ', userOrders);
+// // }
+//   return result;
+// };
+
 export const UserServices = {
   createUserIntoDB,
   getAllUsersFromDB,
   getSingleUserFromDB,
   deleteUserFromDB,
   updateUserById,
+  //   getSingleUserOrdersFromDB,
 };
