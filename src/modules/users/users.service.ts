@@ -15,7 +15,10 @@ const getAllUsersFromDB = async () => {
 };
 
 const getSingleUserFromDB = async (userId: number) => {
-  const result = await Users.aggregate([{ $match: { userId } }]);
+  const result = await Users.aggregate([
+    { $match: { userId } },
+    { $project: { password: 0, __v: 0, isDeleted: 0 } },
+  ]);
   return result;
 };
 
@@ -29,19 +32,23 @@ const updateUserById = async (userId: number, userData: TUser) => {
   return result;
 };
 
-// const getSingleUserOrdersFromDB = async (userId: number) => {
-//   const result = await Users.aggregate([{ $match: { userId } }]);
-//   const orders: Order[] = result?.orders;
-//   const [myorders] = result?.orders[0] || [];
-//   console.log('myOrders = ', myorders);
-
-// //   const data = result?.orders;
-// // if(result.orders){
-// //     const { orders: userOrders } = result;
-// //     console.log('Result = ', userOrders);
-// // }
-//   return result;
-// };
+const getSingleUserOrdersFromDB = async (userId: number) => {
+  const result = await Users.aggregate([
+    { $match: { userId } },
+    { $unwind: '$orders' },
+    {
+      $group: {
+        _id: null,
+        orders: { $push: '$orders' },
+        totalPrice: {
+          $sum: { $multiply: ['$orders.price', '$orders.quantity'] },
+        },
+      },
+    },
+    { $project: { _id: 0, orders: 1, totalPrice: 1 } },
+  ]);
+  return result;
+};
 
 export const UserServices = {
   createUserIntoDB,
@@ -49,5 +56,5 @@ export const UserServices = {
   getSingleUserFromDB,
   deleteUserFromDB,
   updateUserById,
-  //   getSingleUserOrdersFromDB,
+  getSingleUserOrdersFromDB,
 };

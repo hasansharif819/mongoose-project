@@ -110,26 +110,33 @@ const updateUserById = async (req: Request, res: Response) => {
   }
 };
 
-// const getSingleUserOrders = async (req: Request, res: Response) => {
-//   try {
-//     const { userId } = req.params;
-//     console.log('userId', userId);
-//     const userIdNumber = Number(userId);
-//     const result = await UserServices.getSingleUserOrdersFromDB(userIdNumber);
-//     res.status(200).json({
-//       success: true,
-//       message: 'Single user orders fetched successfully',
-//       data: result,
-//     });
-//     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-//   } catch (error: any) {
-//     res.status(500).json({
-//       success: false,
-//       message: error.message || 'User orders is not fetched successfully',
-//       error: error,
-//     });
-//   }
-// };
+const getSingleUserOrders = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const userIdNumber = Number(userId);
+    const result = await UserServices.getSingleUserOrdersFromDB(userIdNumber);
+    if (!result) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
+    const orders = result;
+    res.status(200).json({
+      success: true,
+      message: 'Single user orders fetched successfully',
+      data: orders,
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'User orders is not fetched successfully',
+      error: error,
+    });
+  }
+};
 
 export const UserController = {
   createUser,
@@ -137,5 +144,5 @@ export const UserController = {
   getSingleUser,
   deleteUser,
   updateUserById,
-  //   getSingleUserOrders,
+  getSingleUserOrders,
 };
