@@ -1,13 +1,13 @@
 import app from './app';
-import mongoose from 'mongoose';
 import config from './config';
+import mongoose from 'mongoose';
 
 async function main() {
   try {
     await mongoose.connect(config.database_url as string);
 
     app.listen(config.port, () => {
-      console.log(`Wellcome to my site on port ${config.port}`);
+      console.log(`Welcome to monggose project on port ${config.port}`);
     });
   } catch (error) {
     console.log(error);
