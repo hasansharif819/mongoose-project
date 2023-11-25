@@ -15,4 +15,9 @@ router.patch('/users/:userId', UserController.updateUserById);
 
 router.get('/users/:userId/orders', UserController.getSingleUserOrders);
 
+router.get(
+  '/users/:userId/orders/total-price',
+  UserController.getUserTotalPrice,
+);
+
 export const UserRoute = router;

@@ -120,20 +120,56 @@ const getSingleUserOrders = async (req: Request, res: Response) => {
         success: false,
         message: 'User not found',
       });
+    } else {
+      const orders = result;
+      res.status(200).json({
+        success: true,
+        message: 'Order fetched successfully!',
+        data: orders,
+      });
     }
-    const orders = result;
-    res.status(200).json({
-      success: true,
-      message: 'Single user orders fetched successfully',
-      data: orders,
-    });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     res.status(500).json({
       success: false,
-      message: error.message || 'User orders is not fetched successfully',
-      error: error,
+      message: 'User not found',
+      error: {
+        code: 404,
+        description: 'User not found!',
+      },
+    });
+  }
+};
+
+const getUserTotalPrice = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const userIdNumber = Number(userId);
+    const result = await UserServices.getUserTotalPriceFromDB(userIdNumber);
+    if (!result) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+      });
+    } else {
+      const orders = result;
+      res.status(200).json({
+        success: true,
+        message: 'Total price calculated successfully!',
+        data: orders,
+      });
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: 'User not found',
+      error: {
+        code: 404,
+        description: 'User not found!',
+      },
     });
   }
 };
@@ -145,4 +181,5 @@ export const UserController = {
   deleteUser,
   updateUserById,
   getSingleUserOrders,
+  getUserTotalPrice,
 };

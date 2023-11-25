@@ -40,12 +40,30 @@ const getSingleUserOrdersFromDB = async (userId: number) => {
       $group: {
         _id: null,
         orders: { $push: '$orders' },
+        // totalPrice: {
+        //   $sum: { $multiply: ['$orders.price', '$orders.quantity'] },
+        // },
+      },
+    },
+    { $project: { _id: 0, orders: 1 } },
+  ]);
+  return result;
+};
+
+const getUserTotalPriceFromDB = async (userId: number) => {
+  const result = await Users.aggregate([
+    { $match: { userId } },
+    { $unwind: '$orders' },
+    {
+      $group: {
+        _id: null,
+        orders: { $push: '$orders' },
         totalPrice: {
           $sum: { $multiply: ['$orders.price', '$orders.quantity'] },
         },
       },
     },
-    { $project: { _id: 0, orders: 1, totalPrice: 1 } },
+    { $project: { totalPrice: 1, _id: 0 } },
   ]);
   return result;
 };
@@ -57,4 +75,5 @@ export const UserServices = {
   deleteUserFromDB,
   updateUserById,
   getSingleUserOrdersFromDB,
+  getUserTotalPriceFromDB,
 };
