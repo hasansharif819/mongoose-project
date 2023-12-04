@@ -30,7 +30,25 @@ const getAllUsers = async (req: Request, res: Response) => {
     res.status(200).json({
       success: true,
       message: 'Users fetched successfully',
-      data: result,
+      data: result.map((user) => {
+        return {
+          userId: user.userId,
+          username: user.username,
+          email: user.email,
+          fullName: {
+            firstName: user.fullName.firstName,
+            lastName: user.fullName.lastName,
+          },
+          age: user.age,
+          isActive: user.isActive,
+          hobbies: user.hobbies,
+          address: {
+            street: user.address.street,
+            city: user.address.city,
+            country: user.address.country,
+          },
+        };
+      }),
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
@@ -46,14 +64,43 @@ const getSingleUser = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
     const userIdNumber = parseInt(userId);
-    // console.log('UserId from controllers: ', userIdNumber);
-
     const result = await UserServices.getSingleUserFromDB(userIdNumber);
-    res.status(200).json({
-      success: true,
-      message: 'User fetched successfully!',
-      data: result,
-    });
+
+    if (result.length === 0) {
+      res.status(404).json({
+        success: false,
+        message: 'User did not fetched',
+        error: {
+          code: 404,
+          description: 'User not found',
+        },
+      });
+    } else {
+      res.status(200).json({
+        success: true,
+        message: 'User fetched successfully!',
+        data: result.map((user) => {
+          return {
+            userId: user.userId,
+            username: user.username,
+            email: user.email,
+            fullName: {
+              firstName: user.fullName.firstName,
+              lastName: user.fullName.lastName,
+            },
+            age: user.age,
+            isActive: user.isActive,
+            hobbies: user.hobbies,
+            address: {
+              street: user.address.street,
+              city: user.address.city,
+              country: user.address.country,
+            },
+          };
+        }),
+      });
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     res.status(500).json({
@@ -69,11 +116,23 @@ const deleteUser = async (req: Request, res: Response) => {
     const { userId } = req.params;
     const userIdNumber = Number(userId);
     const result = await UserServices.deleteUserFromDB(userIdNumber);
-    res.status(200).json({
-      success: true,
-      message: 'User deleted successfully!',
-      data: result,
-    });
+    if (result.modifiedCount === 1) {
+      res.status(200).json({
+        success: true,
+        message: 'User deleted successfully!',
+        data: null,
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: 'User not found',
+        error: {
+          code: 404,
+          description: 'User not found',
+        },
+      });
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     res.status(500).json({
@@ -95,13 +154,43 @@ const updateUserById = async (req: Request, res: Response) => {
       userIdNumber,
       zodParsedData,
     );
+    const data = await UserServices.getSingleUserFromDB(userIdNumber);
 
-    // const result = await UserServices.updateUserById({ userIdNumber }, userData);
-    res.status(200).json({
-      status: 'Success',
-      message: 'User updated successfully!',
-      data: result,
-    });
+    if (result.modifiedCount === 1 && data.length !== 0) {
+      res.status(200).json({
+        success: true,
+        message: 'User updated successfully!',
+        data: data.map((user) => {
+          return {
+            userId: user.userId,
+            username: user.username,
+            email: user.email,
+            fullName: {
+              firstName: user.fullName.firstName,
+              lastName: user.fullName.lastName,
+            },
+            age: user.age,
+            isActive: user.isActive,
+            hobbies: user.hobbies,
+            address: {
+              street: user.address.street,
+              city: user.address.city,
+              country: user.address.country,
+            },
+          };
+        }),
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: 'User not found!',
+        error: {
+          code: 404,
+          description: 'User not found!',
+        },
+      });
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     res.status(500).json({
@@ -117,17 +206,20 @@ const getSingleUserOrders = async (req: Request, res: Response) => {
     const { userId } = req.params;
     const userIdNumber = Number(userId);
     const result = await UserServices.getSingleUserOrdersFromDB(userIdNumber);
-    if (!result) {
-      return res.status(404).json({
-        success: false,
-        message: 'User not found',
-      });
-    } else {
-      const orders = result;
+    if (result !== null && result.length > 0) {
       res.status(200).json({
         success: true,
         message: 'Order fetched successfully!',
-        data: orders,
+        data: result[0],
+      });
+    } else {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+        error: {
+          code: 404,
+          description: 'User not found!',
+        },
       });
     }
 

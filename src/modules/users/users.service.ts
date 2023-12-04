@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import { TUser } from './users.interface';
 import { Users } from './users.model';
 
@@ -24,9 +25,7 @@ const getSingleUserFromDB = async (userId: number) => {
     { $match: { userId } },
     { $project: { password: 0, __v: 0, isDeleted: 0 } },
   ]);
-  if (result.length === 0) {
-    throw new Error('User did not fetched');
-  }
+
   return result;
 };
 

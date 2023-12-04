@@ -24,7 +24,7 @@ const ordersValidationSchema = z.object({
 // });
 
 const userZodValidationSchema = z.object({
-  userId: z.number().min(1).max(20),
+  userId: z.number().min(1),
   username: z.string().min(1).max(20),
   password: z.string().min(1),
   fullName: userNameValidationSchema,
