@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-undef */
-import { TUser } from './users.interface';
+import { TUser, TOrders } from './users.interface';
 import { Users } from './users.model';
 
 const createUserIntoDB = async (userData: TUser) => {
@@ -11,7 +12,6 @@ const createUserIntoDB = async (userData: TUser) => {
 };
 
 const getAllUsersFromDB = async () => {
-  //   const result = await Users.find();
   const result = await Users.aggregate([
     { $match: {} },
     { $project: { password: 0, __v: 0, isDeleted: 0 } },
@@ -69,6 +69,14 @@ const getUserTotalPriceFromDB = async (userId: number) => {
     },
     { $project: { totalPrice: 1, _id: 0 } },
   ]);
+  return result[0];
+};
+
+const updateOrderById = async (userId: number, orderData: TOrders) => {
+  const result = await Users.findOneAndUpdate(
+    { userId },
+    { $push: { orders: orderData } },
+  );
   return result;
 };
 
@@ -80,4 +88,5 @@ export const UserServices = {
   updateUserById,
   getSingleUserOrdersFromDB,
   getUserTotalPriceFromDB,
+  updateOrderById,
 };

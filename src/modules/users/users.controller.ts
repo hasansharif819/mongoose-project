@@ -1,6 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from 'express';
 import { UserServices } from './users.service';
-import userZodValidationSchema from './users.validation';
+import { userValidation } from './users.validation';
+
+const { userZodValidationSchema, ordersValidationSchema } = userValidation;
 
 const createUser = async (req: Request, res: Response) => {
   try {
@@ -268,6 +271,48 @@ const getUserTotalPrice = async (req: Request, res: Response) => {
   }
 };
 
+const updateOrder = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const userIdNumber = Number(userId);
+    const { order: orderData } = req.body;
+
+    const zodParsedData = ordersValidationSchema.parse(orderData);
+    const result = await UserServices.updateOrderById(
+      userIdNumber,
+      zodParsedData,
+    );
+
+    if (result !== null) {
+      res.status(200).json({
+        success: true,
+        message: 'Order created successfully!',
+        data: null,
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: 'User not found!',
+        error: {
+          code: 404,
+          description: 'User not found!',
+        },
+      });
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    res.status(404).json({
+      success: false,
+      message: 'User not found!',
+      error: {
+        code: 404,
+        description: 'User not found!',
+      },
+    });
+  }
+};
+
 export const UserController = {
   createUser,
   getAllUsers,
@@ -276,4 +321,5 @@ export const UserController = {
   updateUserById,
   getSingleUserOrders,
   getUserTotalPrice,
+  updateOrder,
 };

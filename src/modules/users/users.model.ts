@@ -99,9 +99,7 @@ const userSchema = new Schema<TUser, UserModel>({
     type: addressSchema,
     required: true,
   },
-  orders: {
-    type: [ordersSchema],
-  },
+  orders: [ordersSchema],
 });
 
 userSchema.pre('save', async function (next) {

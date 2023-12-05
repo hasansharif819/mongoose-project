@@ -17,12 +17,6 @@ const ordersValidationSchema = z.object({
   quantity: z.number(),
 });
 
-// const ordersSchema = z.object({
-//   productName: z.string(),
-//   price: z.number(),
-//   quantity: z.number(),
-// });
-
 const userZodValidationSchema = z.object({
   userId: z.number().min(1),
   username: z.string().min(1).max(20),
@@ -37,4 +31,9 @@ const userZodValidationSchema = z.object({
   orders: z.array(ordersValidationSchema).optional(),
 });
 
-export default userZodValidationSchema;
+// export default userZodValidationSchema;
+
+export const userValidation = {
+  userZodValidationSchema,
+  ordersValidationSchema,
+};

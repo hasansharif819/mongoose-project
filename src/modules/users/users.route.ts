@@ -19,5 +19,6 @@ router.get(
   '/users/:userId/orders/total-price',
   UserController.getUserTotalPrice,
 );
+router.put('/users/:userId/orders', UserController.updateOrder);
 
 export const UserRoute = router;
