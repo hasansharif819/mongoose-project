@@ -72,7 +72,7 @@ const getSingleUser = async (req: Request, res: Response) => {
     if (result.length === 0) {
       res.status(404).json({
         success: false,
-        message: 'User did not fetched',
+        message: 'User not fetched',
         error: {
           code: 404,
           description: 'User not found',
@@ -108,7 +108,7 @@ const getSingleUser = async (req: Request, res: Response) => {
   } catch (error: any) {
     res.status(500).json({
       success: false,
-      message: error.message || 'User did not fetched',
+      message: error.message || 'User not found',
       error: error,
     });
   }
