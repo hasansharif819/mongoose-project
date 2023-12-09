@@ -3,19 +3,40 @@ import { Request, Response } from 'express';
 import { UserServices } from './users.service';
 import { userValidation } from './users.validation';
 
-const { userZodValidationSchema, ordersValidationSchema } = userValidation;
+const {
+  createUserZodValidationSchema,
+  ordersValidationSchema,
+  updateUserZodValidationSchema,
+} = userValidation;
 
 const createUser = async (req: Request, res: Response) => {
   try {
-    const { user: userData } = req.body;
+    // const { user: userData } = req.body;
 
-    const zodParsedData = userZodValidationSchema.parse(userData);
+    // const zodParsedData = userZodValidationSchema.parse(userData);
+    const zodParsedData = createUserZodValidationSchema.parse(req.body);
     const result = await UserServices.createUserIntoDB(zodParsedData);
 
     res.status(200).json({
       success: true,
       message: 'User created successfully!',
-      data: result,
+      data: {
+        userId: result.userId,
+        username: result.username,
+        fullName: {
+          firstName: result.fullName.firstName,
+          lastName: result.fullName.lastName,
+        },
+        age: result.age,
+        email: result.email,
+        isActive: result.isActive,
+        hobbies: result.hobbies,
+        address: {
+          street: result.address.street,
+          city: result.address.city,
+          country: result.address.country,
+        },
+      },
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
@@ -33,6 +54,7 @@ const getAllUsers = async (req: Request, res: Response) => {
     res.status(200).json({
       success: true,
       message: 'Users fetched successfully',
+
       data: result.map((user) => {
         return {
           userId: user.userId,
@@ -50,6 +72,7 @@ const getAllUsers = async (req: Request, res: Response) => {
             city: user.address.city,
             country: user.address.country,
           },
+          orders: user.orders,
         };
       }),
     });
@@ -72,7 +95,7 @@ const getSingleUser = async (req: Request, res: Response) => {
     if (result.length === 0) {
       res.status(404).json({
         success: false,
-        message: 'User not fetched',
+        message: 'User not found',
         error: {
           code: 404,
           description: 'User not found',
@@ -99,6 +122,7 @@ const getSingleUser = async (req: Request, res: Response) => {
               city: user.address.city,
               country: user.address.country,
             },
+            orders: user.orders,
           };
         }),
       });
@@ -150,9 +174,8 @@ const updateUserById = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
     const userIdNumber = Number(userId);
-    const { user: userData } = req.body;
 
-    const zodParsedData = userZodValidationSchema.parse(userData);
+    const zodParsedData = updateUserZodValidationSchema.parse(req.body);
     const result = await UserServices.updateUserById(
       userIdNumber,
       zodParsedData,
@@ -247,7 +270,11 @@ const getUserTotalPrice = async (req: Request, res: Response) => {
     if (!result) {
       return res.status(404).json({
         success: false,
-        message: 'User not found',
+        message: 'User not found!',
+        error: {
+          code: 404,
+          description: 'User not found!',
+        },
       });
     } else {
       const orders = result;
@@ -275,9 +302,9 @@ const updateOrder = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
     const userIdNumber = Number(userId);
-    const { order: orderData } = req.body;
+    // const { order: orderData } = req.body;
 
-    const zodParsedData = ordersValidationSchema.parse(orderData);
+    const zodParsedData = ordersValidationSchema.parse(req.body);
     const result = await UserServices.updateOrderById(
       userIdNumber,
       zodParsedData,

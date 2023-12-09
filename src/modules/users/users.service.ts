@@ -3,11 +3,11 @@
 import { TUser, TOrders } from './users.interface';
 import { Users } from './users.model';
 
-const createUserIntoDB = async (userData: TUser) => {
-  if (await Users.isUserExists(userData.userId)) {
+const createUserIntoDB = async (payload: TUser) => {
+  if (await Users.isUserExists(payload.userId)) {
     throw new Error('User already exists!!!!');
   }
-  const result = await Users.create(userData);
+  const result = await Users.create(payload);
   return result;
 };
 
@@ -34,8 +34,8 @@ const deleteUserFromDB = async (userId: number) => {
   return result;
 };
 
-const updateUserById = async (userId: number, userData: TUser) => {
-  const result = await Users.updateOne({ userId }, userData);
+const updateUserById = async (userId: number, payload: Partial<TUser>) => {
+  const result = await Users.updateOne({ userId }, payload);
   return result;
 };
 
